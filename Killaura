@@ -1,0 +1,29 @@
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local DamageRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("DealDamage")
+
+local MobFolders = {
+	Workspace:WaitForChild("Mobs"):WaitForChild("Regular"),
+	Workspace:WaitForChild("Mobs"):WaitForChild("MegaBoss"),
+}
+
+local RANGE = 35
+
+task.spawn(function()
+	while task.wait(0.01) do
+		local root = Character:FindFirstChild("HumanoidRootPart")
+		for _, folder in ipairs(MobFolders) do
+			for _, obj in ipairs(folder:GetChildren()) do
+				local MobRoot = obj:FindFirstChild("HumanoidRootPart")
+				if obj:IsA("Model") and obj.Parent and MobRoot then
+					if (MobRoot.Position - root.Position).Magnitude <= RANGE then
+						DamageRemote:FireServer(obj)
+					end
+				end
+			end
+		end
+	end
+end)
